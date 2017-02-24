@@ -10,42 +10,24 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using WindowsFormsApplication1;
 
 namespace FileAccessControl
 {
     public partial class ACLView : Form
     {
+        List<FileSystemAccessRule> allRules = new List<FileSystemAccessRule>();
+        string filename;
         public ACLView(String filename)
         {
             InitializeComponent();
-
+            this.filename = filename;
 
 
             permissionsList.AutoArrange = true;
+            setAndAddHeaders();
 
-
-            ColumnHeader nameHeader = new ColumnHeader("Name");
-            nameHeader.Width = 100;
-            ColumnHeader accessControlHeader = new ColumnHeader("Access Control");
-            accessControlHeader.Width = 150;
-            accessControlHeader.Text = "Access Control Type";
-            ColumnHeader systemRightsHeader = new ColumnHeader("System Rights");
-            systemRightsHeader.Width = 150;
-            systemRightsHeader.Text = "File System Rights";
-            ColumnHeader identityReferenceHeader = new ColumnHeader("Identity Reference");
-            identityReferenceHeader.Width = 150;
-            identityReferenceHeader.Text = "Identity Reference";
-            ColumnHeader inheritedRulesHeader = new ColumnHeader("Inherited Rules");
-            inheritedRulesHeader.Width = 150;
-            inheritedRulesHeader.Text = "Inherited Rules";
-
-
-            permissionsList.Columns.Add(nameHeader);
-            permissionsList.Columns.Add(accessControlHeader);
-            permissionsList.Columns.Add(systemRightsHeader);
-            permissionsList.Columns.Add(identityReferenceHeader);
-            permissionsList.Columns.Add(inheritedRulesHeader);
-            permissionsList.View = View.Details;
+            
 
             AuthorizationRuleCollection rules = getAuthorizationRules(filename);
 
@@ -65,6 +47,8 @@ namespace FileAccessControl
                 file.SubItems.Add(inheritedRulesString);
 
                 permissionsList.Items.Add(file);
+                allRules.Add(fileRule);
+
             }
         }
 
@@ -104,6 +88,43 @@ namespace FileAccessControl
                 AuthorizationRuleCollection rules = securityDescriptor.GetAccessRules(true, true, typeof(NTAccount));
                 return rules;
             }
+        }
+
+        private void editButton_Click(object sender, EventArgs e)
+        {
+            int index = permissionsList.SelectedIndices[0];
+            FileSystemAccessRule selectedRule = allRules[index];
+            Form2 frm = new Form2(selectedRule, filename);
+            frm.Show();
+            this.Hide();
+            
+        }
+
+        private void setAndAddHeaders()
+        {
+            ColumnHeader nameHeader = new ColumnHeader("Name");
+            nameHeader.Width = 100;
+            nameHeader.Text = "File Name";
+            ColumnHeader accessControlHeader = new ColumnHeader("Access Control");
+            accessControlHeader.Width = 150;
+            accessControlHeader.Text = "Access Control Type";
+            ColumnHeader systemRightsHeader = new ColumnHeader("System Rights");
+            systemRightsHeader.Width = 150;
+            systemRightsHeader.Text = "File System Rights";
+            ColumnHeader identityReferenceHeader = new ColumnHeader("Identity Reference");
+            identityReferenceHeader.Width = 150;
+            identityReferenceHeader.Text = "Identity Reference";
+            ColumnHeader inheritedRulesHeader = new ColumnHeader("Inherited Rules");
+            inheritedRulesHeader.Width = 150;
+            inheritedRulesHeader.Text = "Inherited Rules";
+
+
+            permissionsList.Columns.Add(nameHeader);
+            permissionsList.Columns.Add(accessControlHeader);
+            permissionsList.Columns.Add(systemRightsHeader);
+            permissionsList.Columns.Add(identityReferenceHeader);
+            permissionsList.Columns.Add(inheritedRulesHeader);
+            permissionsList.View = View.Details;
         }
     }
 }

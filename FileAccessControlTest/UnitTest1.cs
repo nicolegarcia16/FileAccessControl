@@ -65,5 +65,7 @@ namespace FileAccessControlTest
             AuthorizationRuleCollection rules = frm.getAuthorizationRules(filename);
             Assert.IsTrue(rules.Count > 0);
         }
+
+
     }
 }
